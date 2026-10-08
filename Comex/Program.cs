@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net.Http.Json;
 
-Console.WriteLine("Hello, World!");
 Dictionary<int, string> clientes = new Dictionary<int, string>();
 Dictionary<string, int> produtos = new Dictionary<string, int>();
 Dictionary <string,List<string>> carrinho = new Dictionary<string, List<string>>();
