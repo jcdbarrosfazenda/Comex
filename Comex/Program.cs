@@ -1,10 +1,17 @@
 ﻿using System.Diagnostics;
 using System.Net.Http.Json;
+using System.Collections.Generic;
+using Produto = Comex.Produto;
+using Cliente = Comex.Cliente;
+using Endereco = Comex.Endereco;
 
-Dictionary<int, string> clientes = new Dictionary<int, string>();
-Dictionary<string, int> produtos = new Dictionary<string, int>();
+
+Dictionary<string, Cliente> clientes = new Dictionary<string, Cliente>();
+Dictionary<string, Produto> produtos = new Dictionary<string, Produto>();
 Dictionary <string,List<string>> carrinho = new Dictionary<string, List<string>>();
 
+//Produto produto = new Produto("Exemplo", 10.0f, 1);
+//Console.WriteLine(produto.Descricao);
 
 void ExibirMenuDeOpcoes()
 {
@@ -57,8 +64,9 @@ void CadastrarCliente()
     Console.Write("\nDigite o nome do usuario:");
     string usuario = Console.ReadLine();
     Console.Write("\nDigite o CPF do usuario:");
-    int cpf = int.Parse(Console.ReadLine());
-    clientes.Add(cpf, usuario);
+    string cpf = Console.ReadLine();
+    Cliente cliente = new Cliente(usuario, cpf);
+    clientes.Add(usuario, cliente);
     carrinho.Add(usuario, []);
 
     Console.WriteLine($"Usuario {usuario} ({cpf}) cadastrado com sucesso!");
@@ -75,7 +83,7 @@ void ListarClientes()
 
     foreach (var cliente in clientes)
     {
-        Console.WriteLine($"Nome: {cliente.Value}, CPF: {cliente.Key}");
+        Console.WriteLine($"Nome: {cliente.Key}, CPF: {cliente.Value.CPF}");
     }
 
     Thread.Sleep(2000);
@@ -87,12 +95,13 @@ void CadastrarProduto()
 {
     Console.WriteLine("Opção Selecionada:\n3. Cadastrar Produto");
     Console.Write("\nDigite o nome do produto:");
-    string produto = Console.ReadLine();
+    string nome = Console.ReadLine();
     Console.Write("\nDigite o preço do produto:");
     int preco = int.Parse(Console.ReadLine());
-    produtos.Add(produto, preco);
+    Produto produto = new Produto (nome, preco);
+    produtos.Add(nome, produto);
 
-    Console.WriteLine($"Produto {produto} cadastrado com sucesso!");
+    Console.WriteLine($"Produto {nome} cadastrado com sucesso!");
     Thread.Sleep(1000);
     Console.Clear();
     ExibirMenuDeOpcoes();
@@ -102,13 +111,13 @@ void AjustarPrecoDeProduto()
 {
     Console.WriteLine("Opção Selecionada:\n4. Alterar Produto");
     Console.Write("\nDigite o nome do produto que deseja alterar:");
-    string produto = Console.ReadLine();
+    string nome = Console.ReadLine();
 
-    if (produtos.ContainsKey(produto))
+    if (produtos.ContainsKey(nome))
     {
         Console.Write("Qual o novo preço do produto?");
         int novoPreco = int.Parse(Console.ReadLine());
-        produtos[produto] = novoPreco;
+        produtos[nome].PrecoUnitario = novoPreco;
         Console.WriteLine("Alteração de preço do produto cadastrada com sucesso.");
     }
     else
@@ -126,14 +135,14 @@ void AdicionarProdutoNoCarrinho()
     Console.Write("\nDigite o nome do usuário:");
     string usuario = Console.ReadLine();
 
-    if (clientes.ContainsValue(usuario))
+    if (clientes.ContainsKey(usuario))
     {
         Console.Write("Qual produto quer adicionar ao carrinho?");
-        string produto = Console.ReadLine();
+        string nome = Console.ReadLine();
 
-        if (produtos.ContainsKey(produto))
+        if (produtos.ContainsKey(nome))
         {
-            carrinho[usuario].Add(produto);
+            carrinho[usuario].Add(nome);
             Console.Write("Produto adicionado com successo.");
         }
         else
@@ -157,15 +166,15 @@ void FecharCompra()
     Console.WriteLine("Opção Selecionada:\n6. Fechar Compra");
     Console.Write("\nDigite o nome do usuário:");
     string usuario = Console.ReadLine();
-    int valor = 0;
+    float valor = 0;
 
-    if (clientes.ContainsValue(usuario))
+    if (clientes.ContainsKey(usuario))
     {
         Console.Write("Listando carrinho do usuario:");
         foreach (var item in carrinho[usuario])
         {
-            Console.WriteLine($"Produto {item}, Valor: R$ {produtos[item]:F2}.");
-            valor += produtos[item];
+            Console.WriteLine($"Produto {item}, Valor: R$ {produtos[item].PrecoUnitario:F2}.");
+            valor += produtos[item].PrecoUnitario;
         }
         Console.WriteLine($"Valor total da compra: R$ {valor:F2}");
         Console.Write("Informe os dados do cartao: ");
