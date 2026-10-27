@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Comex
+namespace Comex.Modelos
 {
     public class Produto
     {
